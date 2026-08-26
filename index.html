@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERP Pro MAX | نظام إدارة الأعمال المتكامل</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#6c5ce7;--accent2:#a29bfe;
+  --bg:#0a0d14;--bg2:#0f1320;--card:#141927;--card2:#1a2138;
+  --border:#1e2a42;--text:#e8ecf5;--muted:#7a8599;
+  --success:#00b894;--danger:#ff5e6c;--warning:#fdcb6e;--info:#0984e3;
+  --radius:14px;--shadow:0 12px 40px rgba(0,0,0,.4);
+  --side-w:270px;--topbar-h:64px;
+  --grad:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,#000));
+  --gold:#d4af37;
+}
+body.light{--bg:#f0f2f8;--bg2:#e8ebf3;--card:#fff;--card2:#f7f8fc;--border:#dde2ee;--text:#1a2138;--muted:#5f6b82;--shadow:0 8px 30px rgba(30,40,80,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:
+  radial-gradient(800px 400px at 90% -10%,color-mix(in srgb,var(--accent) 12%,transparent),transparent),
+  radial-gradient(600px 400px at 5% 110%,color-mix(in srgb,var(--accent) 7%,transparent),transparent)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+::-webkit-scrollbar-track{background:transparent}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none}
+input,select,textarea{font-family:inherit;background:var(--bg2);color:var(--text);border:1.5px solid var(--border);border-radius:calc(var(--radius) - 5px);padding:11px 14px;font-size:.9rem;width:100%;outline:none;transition:.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+label{font-size:.78rem;color:var(--muted);font-weight:700;display:block;margin-bottom:5px}
+.hidden{display:none!important}
+
+/* ===== شاشة الدخول ===== */
+#loginScreen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+#loginScreen::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(900px 500px at 80% 20%,color-mix(in srgb,var(--accent) 15%,transparent),transparent),
+  radial-gradient(700px 400px at 20% 80%,color-mix(in srgb,var(--accent) 10%,transparent),transparent)}
+.login-box{position:relative;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:44px 40px;width:100%;max-width:420px;box-shadow:var(--shadow);animation:pop .4s}
+.login-box .logo-big{width:72px;height:72px;border-radius:20px;background:var(--grad);display:grid;place-items:center;font-size:2rem;color:#fff;margin:0 auto 20px;box-shadow:0 12px 30px color-mix(in srgb,var(--accent) 40%,transparent)}
+.login-box h1{text-align:center;font-size:1.4rem;font-weight:900;margin-bottom:6px}
+.login-box p{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:26px}
+.login-box .frm{display:grid;gap:16px}
+.login-box .btn-login{width:100%;padding:14px;font-size:1rem;font-weight:800;border-radius:12px;color:#fff;background:var(--grad);transition:.2s;margin-top:6px}
+.login-box .btn-login:hover{transform:translateY(-2px);box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 45%,transparent)}
+.login-demo{text-align:center;margin-top:18px;font-size:.75rem;color:var(--muted)}
+.login-demo span{cursor:pointer;color:var(--accent);font-weight:700;text-decoration:underline}
+.reset-link{text-align:center;margin-top:12px;font-size:.7rem;color:var(--muted)}
+.reset-link span{cursor:pointer;color:var(--danger);text-decoration:underline}
+
+/* ===== قسم إنشاء المدير الأول ===== */
+#setupSection{display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:20px}
+#setupSection h3{color:var(--gold);margin-bottom:10px;text-align:center}
+#setupSection .frm{display:grid;gap:14px}
+#setupSection .btn-login{width:100%;padding:14px;font-size:1rem;font-weight:800;border-radius:12px;color:#fff;background:var(--grad);transition:.2s;border:none;cursor:pointer;margin-top:6px}
+#setupSection .btn-login:hover{transform:translateY(-2px);box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 45%,transparent)}
+
+/* ===== الهيكل ===== */
+#app{display:none;min-height:100vh;position:relative;z-index:1}
+#app.show{display:flex}
+.sidebar{width:var(--side-w);background:var(--bg2);border-inline-end:1px solid var(--border);position:fixed;inset-block:0;inset-inline-start:0;display:flex;flex-direction:column;z-index:50;transition:transform .3s}
+.brand{display:flex;align-items:center;gap:12px;padding:18px;border-bottom:1px solid var(--border)}
+.brand .logo{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-weight:900;font-size:1.2rem;color:#fff;background:var(--grad);box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 35%,transparent);flex-shrink:0}
+.brand b{font-size:1rem;display:block;line-height:1.2}
+.brand small{color:var(--muted);font-size:.68rem}
+.nav{flex:1;overflow-y:auto;padding:10px}
+.nav-section{font-size:.65rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:12px 14px 6px;margin-top:6px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:calc(var(--radius) - 3px);color:var(--muted);font-weight:600;font-size:.86rem;margin-bottom:2px;transition:.2s;cursor:pointer;border:1px solid transparent;position:relative}
+.nav-item:hover{background:var(--card);color:var(--text)}
+.nav-item.active{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 20%,transparent),color-mix(in srgb,var(--accent) 7%,transparent));color:var(--text);border-color:color-mix(in srgb,var(--accent) 35%,transparent)}
+.nav-item .ico{font-size:1.05rem;width:24px;text-align:center}
+.nav-item .badge{margin-inline-start:auto;background:var(--danger);color:#fff;font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:99px}
+.side-foot{padding:12px;border-top:1px solid var(--border);font-size:.68rem;color:var(--muted);text-align:center}
+.main{flex:1;margin-inline-start:var(--side-w);display:flex;flex-direction:column;min-width:0;min-height:100vh}
+
+/* ===== الشريط العلوي ===== */
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;padding:0 22px;height:var(--topbar-h);background:color-mix(in srgb,var(--bg2) 85%,transparent);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.hamb{display:none;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:10px;width:38px;height:38px;font-size:1.05rem}
+.ptitle{font-size:1rem;font-weight:800;white-space:nowrap}
+.top-actions{margin-inline-start:auto;display:flex;align-items:center;gap:9px}
+.icon-btn{position:relative;width:38px;height:38px;border-radius:11px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:1rem;display:grid;place-items:center;transition:.2s}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+.badge-dot{position:absolute;top:-4px;inset-inline-start:-4px;background:var(--danger);color:#fff;font-size:.58rem;font-weight:800;min-width:16px;height:16px;border-radius:99px;display:grid;place-items:center;padding:0 3px}
+.user-chip{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:4px 12px 4px 4px;cursor:pointer;transition:.2s}
+.user-chip:hover{border-color:var(--accent)}
+.user-chip .av{width:30px;height:30px;border-radius:9px;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:800;font-size:.8rem}
+.user-chip .info{text-align:right}
+.user-chip .info b{font-size:.76rem;display:block;line-height:1.2}
+.user-chip .info small{font-size:.62rem;color:var(--muted)}
+.rel{position:relative}
+.drop-menu{position:absolute;top:calc(100% + 8px);inset-inline-end:0;min-width:220px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:8px;display:none;z-index:60}
+.drop-menu.show{display:block}
+.drop-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:9px;font-size:.82rem;font-weight:600;transition:.15s;cursor:pointer}
+.drop-item:hover{background:var(--bg2)}
+.drop-item.danger{color:var(--danger)}
+.notif-panel{position:absolute;top:calc(100% + 8px);inset-inline-end:0;width:340px;max-height:400px;overflow-y:auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:none;z-index:60}
+.notif-panel.show{display:block}
+.notif-panel h4{font-size:.82rem;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.notif-item{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px;font-size:.78rem;background:var(--bg2);margin-bottom:6px;border-inline-start:3px solid var(--accent)}
+.notif-item.unread{background:color-mix(in srgb,var(--accent) 8%,var(--bg2))}
+.notif-item .time{font-size:.65rem;color:var(--muted);margin-top:2px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:45;display:none}
+body.nav-open .overlay{display:block}
+body.nav-open .sidebar{transform:none;box-shadow:var(--shadow)}
+
+/* ===== المحتوى ===== */
+.content{padding:24px;max-width:1440px;width:100%;margin-inline:auto;flex:1}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:.25s}
+.card:hover{border-color:color-mix(in srgb,var(--accent) 30%,var(--border))}
+.kpi{display:flex;gap:14px;align-items:center;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;inset-inline-end:-25px;top:-25px;width:100px;height:100px;border-radius:50%;background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.kpi .ic{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;font-size:1.35rem;flex-shrink:0;background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.kpi h3{font-size:1.25rem;font-weight:800;line-height:1.2}
+.kpi p{font-size:.75rem;color:var(--muted);font-weight:600}
+.card h2{font-size:.95rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.cols-2{grid-template-columns:2fr 1fr}
+.cols-3{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.page-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.page-head h1{font-size:1.2rem;font-weight:900}
+.page-head .sp{flex:1}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:.68rem;font-weight:700}
+.tag.ok{background:color-mix(in srgb,var(--success) 16%,transparent);color:var(--success)}
+.tag.bad{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
+.tag.warn{background:color-mix(in srgb,var(--warning) 16%,transparent);color:#b58a1b}
+.tag.info{background:color-mix(in srgb,var(--info) 16%,transparent);color:var(--info)}
+.tag.accent{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+
+/* ===== الجداول ===== */
+.table-wrap{overflow-x:auto;border-radius:calc(var(--radius) - 4px);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:600px}
+thead th{background:var(--bg2);color:var(--muted);font-size:.72rem;font-weight:700;padding:12px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border)}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{transition:.15s}
+tbody tr:hover{background:color-mix(in srgb,var(--accent) 4%,transparent)}
+tbody tr:last-child td{border-bottom:none}
+.row-actions{display:flex;gap:5px}
+.mini{width:31px;height:31px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:.82rem;transition:.2s;display:grid;place-items:center}
+.mini:hover{border-color:var(--accent);color:var(--accent)}
+.mini.del:hover{border-color:var(--danger);color:var(--danger)}
+
+/* ===== الأزرار ===== */
+.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:calc(var(--radius) - 5px);padding:10px 18px;font-weight:700;font-size:.83rem;transition:.2s;color:#fff;background:var(--grad)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 40%,transparent)}
+.btn.ghost{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn.ghost:hover{border-color:var(--accent);box-shadow:none;color:var(--accent)}
+.btn.danger{background:linear-gradient(135deg,var(--danger),#b8232f)}
+.btn.success{background:linear-gradient(135deg,var(--success),#007a5e)}
+.btn.sm{padding:7px 13px;font-size:.74rem;border-radius:9px}
+.btn.xs{padding:5px 10px;font-size:.68rem;border-radius:7px}
+
+/* ===== النوافذ ===== */
+.modal{position:fixed;inset:0;background:rgba(4,6,12,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:100;padding:16px}
+.modal.show{display:grid}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:calc(var(--radius) + 6px);width:100%;max-width:680px;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow);animation:pop .25s}
+@keyframes pop{from{transform:translateY(20px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);z-index:2}
+.modal-head h3{font-size:1rem;font-weight:800}
+.modal-body{padding:22px}
+.modal-foot{display:flex;gap:10px;padding:14px 22px;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--card)}
+.frm{display:grid;gap:14px}
+.frm.c2{grid-template-columns:1fr 1fr}
+.frm.c3{grid-template-columns:1fr 1fr 1fr}
+.fg.full{grid-column:1/-1}
+
+/* ===== POS ===== */
+.pos-layout{display:grid;grid-template-columns:1fr 380px;gap:16px;height:calc(100vh - var(--topbar-h) - 48px)}
+.pos-products{overflow-y:auto}
+.pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.pos-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:.2s}
+.pos-item:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 20px color-mix(in srgb,var(--accent) 20%,transparent)}
+.pos-item .emoji{font-size:1.8rem;margin-bottom:6px}
+.pos-item .name{font-size:.76rem;font-weight:700;margin-bottom:3px}
+.pos-item .price{font-size:.82rem;font-weight:800;color:var(--accent)}
+.pos-item .qty{font-size:.65rem;color:var(--muted)}
+.pos-cart{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden}
+.pos-cart-head{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:800;font-size:.9rem;display:flex;justify-content:space-between;align-items:center}
+.pos-cart-items{flex:1;overflow-y:auto;padding:12px}
+.pos-cart-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--bg2);margin-bottom:8px;font-size:.8rem}
+.pos-cart-item .qty-ctrl{display:flex;align-items:center;gap:6px}
+.pos-cart-item .qty-ctrl button{width:24px;height:24px;border-radius:6px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:.75rem;display:grid;place-items:center}
+.pos-cart-item .qty-ctrl span{font-weight:700;min-width:20px;text-align:center}
+.pos-cart-item .total{margin-inline-start:auto;font-weight:800;color:var(--accent)}
+.pos-cart-item .del-item{color:var(--danger);cursor:pointer;font-size:.9rem}
+.pos-cart-foot{padding:16px 18px;border-top:1px solid var(--border)}
+.pos-total{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:900;margin-bottom:12px}
+.pos-barcode{display:flex;gap:8px;margin-bottom:12px}
+.pos-barcode input{flex:1;padding:9px 12px;font-size:.85rem}
+.pos-barcode button{padding:9px 14px;font-size:.85rem}
+
+/* ===== المشاريع ===== */
+.proj-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:.2s}
+.proj-card:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--border));transform:translateY(-2px)}
+.proj-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.proj-title{font-weight:800;font-size:.9rem}
+.proj-desc{font-size:.75rem;color:var(--muted);margin-bottom:12px}
+.proj-progress{height:7px;background:var(--bg2);border-radius:99px;overflow:hidden;margin:10px 0}
+.proj-progress .bar{height:100%;border-radius:99px;background:var(--grad);transition:width .5s}
+.proj-meta{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)}
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+
+/* ===== سير العمل ===== */
+.wf-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:10px;transition:.2s}
+.wf-item:hover{border-color:color-mix(in srgb,var(--accent) 30%,var(--border))}
+.wf-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.2rem;flex-shrink:0}
+.wf-info{flex:1}
+.wf-info b{font-size:.85rem;display:block}
+.wf-info small{font-size:.72rem;color:var(--muted)}
+.wf-status{font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:99px}
+.wf-status.pending{background:color-mix(in srgb,var(--warning) 15%,transparent);color:#b58a1b}
+.wf-status.approved{background:color-mix(in srgb,var(--success) 15%,transparent);color:var(--success)}
+.wf-status.rejected{background:color-mix(in srgb,var(--danger) 15%,transparent);color:var(--danger)}
+
+/* ===== سجل التدقيق ===== */
+.audit-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);font-size:.8rem}
+.audit-item:last-child{border-bottom:none}
+.audit-dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.audit-item .time{font-size:.68rem;color:var(--muted)}
+
+/* ===== إعدادات ===== */
+.set-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));align-items:start}
+.swatches{display:flex;gap:9px;flex-wrap:wrap;margin-top:4px}
+.sw{width:34px;height:34px;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:.2s}
+.sw.on{border-color:#fff;transform:scale(1.12);box-shadow:0 0 0 2px var(--accent)}
+.switch-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);font-size:.85rem;font-weight:600}
+.switch-row:last-child{border-bottom:none}
+.switch{position:relative;width:46px;height:25px;flex-shrink:0}
+.switch input{display:none}
+.switch i{position:absolute;inset:0;background:var(--border);border-radius:99px;transition:.25s;cursor:pointer}
+.switch i::after{content:'';position:absolute;width:19px;height:19px;border-radius:50%;background:#fff;top:3px;inset-inline-start:3px;transition:.25s}
+.switch input:checked + i{background:var(--accent)}
+.switch input:checked + i::after{inset-inline-start:24px}
+input[type=range]{padding:0;accent-color:var(--accent)}
+input[type=color]{padding:3px;height:42px;width:55px;cursor:pointer}
+
+/* ===== الفواتير ===== */
+.inv-row{display:grid;grid-template-columns:2fr .7fr 1fr 36px;gap:8px;margin-bottom:8px;align-items:center}
+.inv-row select,.inv-row input{padding:8px 10px;font-size:.82rem}
+.ibtn{background:var(--bg2);border:1px solid var(--border);color:var(--danger);border-radius:9px;height:36px;display:grid;place-items:center}
+.inv-sum{background:var(--bg2);border:1px solid var(--border);border-radius:calc(var(--radius) - 4px);padding:14px;margin-top:12px;font-size:.86rem}
+.inv-sum .ln{display:flex;justify-content:space-between;margin-bottom:6px;color:var(--muted)}
+.inv-sum .tot{font-size:1.05rem;font-weight:800;color:var(--text);border-top:1px dashed var(--border);padding-top:8px;margin-top:8px}
+
+/* ===== التنبيهات ===== */
+#toast{position:fixed;bottom:24px;inset-inline-start:50%;transform:translateX(50%) translateY(90px);z-index:200;background:var(--card);border:1px solid var(--border);border-inline-start:4px solid var(--success);border-radius:12px;padding:13px 22px;font-weight:700;font-size:.85rem;box-shadow:var(--shadow);transition:.35s;opacity:0;max-width:90vw}
+#toast.show{transform:translateX(50%) translateY(0);opacity:1}
+#toast.err{border-inline-start-color:var(--danger)}
+.empty{text-align:center;padding:45px 20px;color:var(--muted)}
+.empty .big{font-size:2.6rem;margin-bottom:8px}
+canvas{width:100%;height:260px;display:block}
+.search-box{position:relative;max-width:300px}
+.search-box input{padding-inline-start:36px}
+.search-box::before{content:'🔍';position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);font-size:.8rem;opacity:.5}
+
+/* ===== تجاوب ===== */
+@media(max-width:1024px){
+  .cols-2{grid-template-columns:1fr}
+  .pos-layout{grid-template-columns:1fr;height:auto}
+  .pos-cart{max-height:400px}
+}
+@media(max-width:920px){
+  .sidebar{transform:translateX(100%)}
+  body.nav-open .sidebar{transform:none}
+  .main{margin-inline-start:0}
+  .hamb{display:grid;place-items:center}
+  .frm.c2,.frm.c3{grid-template-columns:1fr}
+  .user-chip .info{display:none}
+  .inv-row{grid-template-columns:1.5fr .6fr 1fr 32px}
+  .content{padding:16px}
+}
+@media print{.sidebar,.topbar,.page-head .btn,#toast{display:none!important}.main{margin:0}}
+</style>
+</head>
+<body>
+
+<!-- ===== شاشة تسجيل الدخول ===== -->
+<div id="loginScreen">
+  <div class="login-box" id="loginBox">
+    <div class="logo-big">⚡</div>
+    <h1 id="loginTitle">ERP Pro MAX</h1>
+    <p id="loginSub">نظام إدارة الأعمال المتكامل — سجل دخولك للمتابعة</p>
+    
+    <!-- نموذج تسجيل الدخول -->
+    <div class="frm" id="loginForm" style="display:none">
+      <div><label>اسم المستخدم</label><input id="loginUser" placeholder="admin" autocomplete="off"></div>
+      <div><label>كلمة المرور</label><input id="loginPass" type="password" placeholder="••••••" autocomplete="off"></div>
+      <div><label>الفرع</label><select id="loginBranch"><option>الفرع الرئيسي</option><option>فرع الرياض</option><option>فرع جدة</option></select></div>
+      <button class="btn-login" onclick="doLogin()">🔐 تسجيل الدخول</button>
+    </div>
+    <div class="login-demo" id="loginDemo" style="display:none">للتجربة: <span onclick="fillDemo()">admin / admin</span></div>
+    
+    <!-- قسم إنشاء المدير الأول -->
+    <div id="setupSection">
+      <h3>🏗️ إنشاء حساب المدير الأول</h3>
+      <p style="font-size:.8rem; color:var(--muted); margin-bottom:15px; text-align:center;">لم يتم العثور على أي مستخدم. قم بإنشاء حساب المدير الأول للنظام.</p>
+      <div class="frm">
+        <div><label>الاسم الكامل</label><input id="setupName" placeholder="أحمد المدير"></div>
+        <div><label>البريد الإلكتروني (اسم المستخدم)</label><input id="setupEmail" placeholder="admin@company.com"></div>
+        <div><label>كلمة المرور</label><input id="setupPass" type="password" placeholder="••••••"></div>
+        <div><label>تأكيد كلمة المرور</label><input id="setupPass2" type="password" placeholder="••••••"></div>
+        <button class="btn-login" onclick="createAdmin()">🚀 إنشاء حساب المدير</button>
+      </div>
+    </div>
+    
+    <!-- رابط إعادة التعيين -->
+    <div class="reset-link">
+      <span onclick="resetSystem()">🔄 إعادة تعيين النظام بالكامل</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== التطبيق ===== -->
+<div id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo" id="brandLogo">E</div>
+      <div><b id="brandName">ERP Pro</b><small id="brandSub">نظام إدارة الأعمال</small></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">ERP Pro MAX v2.1 — <span id="footerUser"></span></div>
+  </aside>
+  <div class="overlay" onclick="toggleNav(false)"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="hamb" onclick="toggleNav()">☰</button>
+      <div class="ptitle" id="pageTitle">لوحة التحكم</div>
+      <div class="top-actions">
+        <div class="rel">
+          <button class="icon-btn" onclick="toggleNotif(event)" title="الإشعارات">🔔<span class="badge-dot" id="notifBadge" style="display:none">0</span></button>
+          <div class="notif-panel" id="notifPanel"></div>
+        </div>
+        <div class="rel">
+          <button class="icon-btn" onclick="toggleTheme()" title="تبديل الثيم">🌙</button>
+        </div>
+        <div class="rel">
+          <div class="user-chip" onclick="toggleUserMenu(event)">
+            <div class="info"><b id="userName">المدير</b><small id="userRole">مدير النظام</small></div>
+            <div class="av" id="userAv">M</div>
+          </div>
+          <div class="drop-menu" id="userMenu">
+            <div class="drop-item" onclick="go('settings')">⚙️ الإعدادات</div>
+            <div class="drop-item" onclick="go('audit')">📋 سجل النشاط</div>
+            <div class="drop-item danger" onclick="doLogout()">🚪 تسجيل الخروج</div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+
+<!-- نافذة عامة -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-head"><h3 id="mTitle"></h3><button class="mini" onclick="closeModal()">✕</button></div>
+    <div class="modal-body" id="mBody"></div>
+    <div class="modal-foot"><button class="btn" id="mOk">حفظ</button><button class="btn ghost" onclick="closeModal()">إلغاء</button></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ================================================================
+   ERP PRO MAX v2.1 - النسخة النهائية بدون بيانات تجريبية
+   نظام يبدأ نظيفاً تماماً مع شاشة إنشاء المدير الأول
+================================================================ */
+// ===== أدوات مساعدة =====
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmt = n => (+n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const today = () => new Date().toISOString().slice(0, 10);
+const now = () => new Date().toISOString();
+
+const simpleHash = str => btoa(unescape(encodeURIComponent(str + '_erp_salt')));
+const verifyHash = (str, hash) => simpleHash(str) === hash;
+
+// ===== قاعدة البيانات =====
+const LS_KEY = 'erp_pro_max_v2_1';
+let DB = null;
+let CURRENT_USER = null;
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    if (d && d.settings && Array.isArray(d.users)) return d;
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveDB() {
+  if (!DB) return;
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(DB));
+  } catch (e) {
+    toast('خطأ في حفظ البيانات!', 'err');
+  }
+}
+
+function seedDB() {
+  DB = {
+    settings: {
+      companyName: 'ERP Pro MAX', 
+      currency: 'ر.س', 
+      taxRate: 15, 
+      accent: '#6c5ce7',
+      theme: 'dark', 
+      radius: '14px', 
+      fontSize: '15px',
+      modules: { 
+        pos: 1, sales: 1, purchases: 1, inventory: 1, 
+        customers: 1, suppliers: 1, hr: 1, accounting: 1, 
+        projects: 1, assets: 1, workflows: 1, reports: 1 
+      }
+    },
+    users: [], customers: [], suppliers: [], products: [], employees: [],
+    sales: [], purchases: [], transactions: [], projects: [], assets: [],
+    workflows: [], notifications: [], audit: [], counters: { sale: 1, purchase: 1 }
+  };
+  saveDB();
+}
+
+// ===== إدارة شاشة الدخول =====
+function renderLoginScreen() {
+  if (!DB) return;
+  if (!Array.isArray(DB.users)) DB.users = [];
+  
+  const validUsers = DB.users.filter(u => u && u.user && u.pass);
+  const hasUsers = validUsers.length > 0;
+  
+  const loginForm = $('#loginForm');
+  const setupSection = $('#setupSection');
+  const loginDemo = $('#loginDemo');
+  const loginTitle = $('#loginTitle');
+  const loginSub = $('#loginSub');
+  
+  if (!loginForm || !setupSection) return;
+  
+  if (!hasUsers) {
+    // إظهار شاشة الإنشاء
+    loginForm.style.display = 'none';
+    loginDemo.style.display = 'none';
+    setupSection.style.display = 'block';
+    loginTitle.textContent = '🏗️ الإعداد الأولي للنظام';
+    loginSub.textContent = 'مرحباً! هذه أول مرة لك. قم بإنشاء حساب المدير العام.';
+  } else {
+    // إظهار شاشة الدخول
+    loginForm.style.display = 'grid';
+    loginDemo.style.display = 'block';
+    setupSection.style.display = 'none';
+    loginTitle.textContent = 'ERP Pro MAX';
+    loginSub.textContent = 'نظام إدارة الأعمال المتكامل — سجل دخولك للمتابعة';
+  }
+}
+
+function doLogin() {
+  const u = $('#loginUser').value.trim();
+  const p = $('#loginPass').value;
+
+  if (!DB?.users?.length) {
+    renderLoginScreen();
+    return toast('يجب إنشاء حساب مدير أولاً', 'err');
+  }
+
+  const found = DB.users.find(x => x.user === u && (x.pass === p || verifyHash(p, x.pass)));
+  if (!found) return toast('بيانات الدخول غير صحيحة', 'err');
+
+  CURRENT_USER = found;
+  $('#loginScreen').style.display = 'none';
+  $('#app').classList.add('show');
+
+  $('#userName').textContent = found.name;
+  const roles = { admin: 'مدير النظام', manager: 'مدير', accountant: 'محاسب' };
+  $('#userRole').textContent = roles[found.role] || 'موظف';
+  $('#userAv').textContent = found.name.charAt(0);
+  $('#footerUser').textContent = found.name;
+
+  applyTheme();
+  render();
+  addAudit('تسجيل دخول', 'دخول النظام بنجاح');
+  toast('مرحباً ' + found.name + ' 👋');
+}
+
+function createAdmin() {
+  const name = $('#setupName').value.trim();
+  const email = $('#setupEmail').value.trim();
+  const pass = $('#setupPass').value;
+  const pass2 = $('#setupPass2').value;
+
+  if (!name || !email || !pass) return toast('جميع الحقول مطلوبة', 'err');
+  if (pass.length < 4) return toast('كلمة المرور يجب أن تكون 4 أحرف على الأقل', 'err');
+  if (pass !== pass2) return toast('كلمتا المرور غير متطابقتين', 'err');
+  if (DB.users.some(u => u.user === email)) return toast('اسم المستخدم موجود مسبقاً', 'err');
+
+  DB.users.push({
+    id: uid(), user: email, pass: simpleHash(pass), name: name,
+    role: 'admin', branch: 'الفرع الرئيسي', createdAt: now()
+  });
+
+  saveDB();
+  
+  CURRENT_USER = DB.users.find(u => u.user === email);
+  $('#loginScreen').style.display = 'none';
+  $('#app').classList.add('show');
+
+  $('#userName').textContent = name;
+  $('#userRole').textContent = 'مدير النظام';
+  $('#userAv').textContent = name.charAt(0);
+  $('#footerUser').textContent = name;
+
+  applyTheme();
+  render();
+  addAudit('إنشاء حساب مدير', 'تم إنشاء حساب المدير الأول: ' + name);
+  toast('مرحباً ' + name + ' 👋');
+}
+
+function doLogout() {
+  CURRENT_USER = null;
+  $('#app').classList.remove('show');
+  $('#loginScreen').style.display = 'flex';
+  $('#loginUser').value = '';
+  $('#loginPass').value = '';
+  renderLoginScreen();
+}
+
+function resetSystem() {
+  if (confirm('⚠️ سيتم مسح جميع البيانات نهائياً. هل أنت متأكد؟')) {
+    localStorage.removeItem(LS_KEY);
+    location.reload();
+  }
+}
+
+// ===== أدوات النظام =====
+function toast(msg, type = 'ok') {
+  const t = $('#toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'show' + (type === 'err' ? ' err' : '');
+  clearTimeout(t._x);
+  t._x = setTimeout(() => t.className = '', 2800);
+}
+
+function openModal(title, body, onOk, okText = 'حفظ') {
+  $('#mTitle').textContent = title;
+  $('#mBody').innerHTML = body;
+  $('#mOk').textContent = okText;
+  $('#mOk').onclick = onOk;
+  $('#modal').classList.add('show');
+}
+
+function closeModal() { $('#modal').classList.remove('show'); }
+
+function addAudit(action, detail = '') {
+  if (!DB) return;
+  DB.audit.unshift({ id: uid(), user: CURRENT_USER?.name || 'النظام', action, detail, time: now() });
+  if (DB.audit.length > 200) DB.audit = DB.audit.slice(0, 200);
+  saveDB();
+}
+
+const fText = (k, l, v = '', req = false) => `<div class="fg"><label>${l}${req ? ' <span style="color:var(--danger)">*</span>' : ''}</label><input id="f_${k}" value="${esc(v)}"></div>`;
+const fNum = (k, l, v = 0, req = false) => `<div class="fg"><label>${l}${req ? ' <span style="color:var(--danger)">*</span>' : ''}</label><input id="f_${k}" type="number" step="any" min="0" value="${v}"></div>`;
+const fDate = (k, l, v) => `<div class="fg"><label>${l}</label><input id="f_${k}" type="date" value="${v || today()}"></div>`;
+
+// ===== الثيم =====
+function applyTheme() {
+  if (!DB?.settings) return;
+  const s = DB.settings, r = document.documentElement.style;
+  r.setProperty('--accent', s.accent);
+  r.setProperty('--radius', s.radius);
+  document.body.classList.toggle('light', s.theme === 'light');
+  document.body.style.fontSize = s.fontSize;
+  $('#brandName').textContent = s.companyName;
+  $('#brandLogo').textContent = (s.companyName || 'E').trim().charAt(0);
+  document.title = s.companyName + ' | ERP Pro MAX';
+}
+
+function toggleTheme() {
+  if (!DB?.settings) return;
+  DB.settings.theme = DB.settings.theme === 'dark' ? 'light' : 'dark';
+  saveDB(); applyTheme(); render();
+}
+
+// ===== التنقل =====
+const NAV = [
+  { id: 'dashboard', label: 'لوحة التحكم', icon: '📊', section: 'الرئيسية', always: 1 },
+  { id: 'pos', label: 'نقاط البيع', icon: '🛒', section: 'العمليات' },
+  { id: 'sales', label: 'المبيعات', icon: '📋', section: 'العمليات' },
+  { id: 'purchases', label: 'المشتريات', icon: '📦', section: 'العمليات' },
+  { id: 'inventory', label: 'المخزون', icon: '🏬', section: 'العمليات' },
+  { id: 'customers', label: 'العملاء', icon: '👥', section: 'العلاقات' },
+  { id: 'suppliers', label: 'الموردون', icon: '🤝', section: 'العلاقات' },
+  { id: 'hr', label: 'الموظفون', icon: '🧑‍💼', section: 'الموارد' },
+  { id: 'projects', label: 'المشاريع', icon: '📁', section: 'الموارد' },
+  { id: 'assets', label: 'الأصول الثابتة', icon: '🏗', section: 'الموارد' },
+  { id: 'accounting', label: 'المحاسبة', icon: '💰', section: 'المالية' },
+  { id: 'workflows', label: 'سير العمل', icon: '✅', section: 'المالية' },
+  { id: 'reports', label: 'التقارير', icon: '📈', section: 'التحليلات' },
+  { id: 'audit', label: 'سجل النشاط', icon: '📋', section: 'النظام' },
+  { id: 'settings', label: 'الإعدادات', icon: '⚙️', section: 'النظام', always: 1 }
+];
+
+let PAGE = 'dashboard';
+
+function buildNav() {
+  if (!DB?.settings) return;
+  let html = '', lastSection = '';
+  NAV.filter(n => n.always || DB.settings.modules[n.id]).forEach(n => {
+    if (n.section !== lastSection) { html += `<div class="nav-section">${n.section}</div>`; lastSection = n.section; }
+    const badge = n.id === 'workflows' ? (DB.workflows?.filter(w => w.status === 'pending').length || 0) : 0;
+    html += `<div class="nav-item ${PAGE === n.id ? 'active' : ''}" onclick="go('${n.id}')">
+      <span class="ico">${n.icon}</span>${n.label}${badge ? `<span class="badge">${badge}</span>` : ''}</div>`;
+  });
+  $('#nav').innerHTML = html;
+}
+
+function go(p) { PAGE = p; render(); toggleNav(false); window.scrollTo({ top: 0 }); }
+function toggleNav(force) { document.body.classList.toggle('nav-open', force !== undefined ? force : !document.body.classList.contains('nav-open')); }
+
+function render() {
+  if (!DB) return;
+  buildNav();
+  const n = NAV.find(x => x.id === PAGE);
+  $('#pageTitle').textContent = n ? n.label : '';
+  $('#content').innerHTML = PAGES[PAGE] ? PAGES[PAGE]() : '<div class="empty">الصفحة غير موجودة</div>';
+  afterRender();
+  updateNotif();
+}
+
+// ===== الإشعارات =====
+function updateNotif() {
+  if (!DB) return;
+  const unread = DB.notifications?.filter(n => !n.read).length || 0;
+  const low = DB.products?.filter(p => p.qty <= p.min).length || 0;
+  const total = unread + low;
+  const b = $('#notifBadge');
+  if (b) { b.style.display = total ? 'grid' : 'none'; b.textContent = total; }
+
+  let html = `<h4>🔔 الإشعارات <button class="btn xs ghost" onclick="markAllRead()">تحديد الكل كمقروء</button></h4>`;
+  (DB.notifications || []).slice(0, 10).forEach(n => {
+    html += `<div class="notif-item ${n.read ? '' : 'unread'}"><div><div>${n.text}</div><div class="time">${new Date(n.time).toLocaleString('ar')}</div></div></div>`;
+  });
+  if (low) html += `<div class="notif-item unread"><div>⚠️ <b>${low}</b> أصناف منخفضة المخزون</div></div>`;
+  const panel = $('#notifPanel');
+  if (panel) panel.innerHTML = html;
+}
+
+function markAllRead() { if (DB?.notifications) DB.notifications.forEach(n => n.read = true); saveDB(); updateNotif(); }
+function toggleNotif(e) { e.stopPropagation(); $('#notifPanel')?.classList.toggle('show'); $('#userMenu')?.classList.remove('show'); }
+function toggleUserMenu(e) { e.stopPropagation(); $('#userMenu')?.classList.toggle('show'); $('#notifPanel')?.classList.remove('show'); }
+document.addEventListener('click', e => {
+  if (!e.target.closest('.rel')) {
+    $('#notifPanel')?.classList.remove('show');
+    $('#userMenu')?.classList.remove('show');
+  }
+});
+function notify(text, type = 'info') {
+  if (!DB) return;
+  if (!DB.notifications) DB.notifications = [];
+  DB.notifications.unshift({ id: uid(), text, time: now(), read: false, type });
+  saveDB(); updateNotif();
+}
+
+// ===== الوحدات العامة =====
+const ENT = {
+  customers: { key: 'customers', title: 'العملاء', single: 'عميل', icon: '👥', fields: [['name', 'اسم العميل', 1], ['phone', 'الهاتف'], ['email', 'البريد'], ['address', 'العنوان'], ['balance', 'الرصيد الافتتاحي', 'money']] },
+  suppliers: { key: 'suppliers', title: 'الموردون', single: 'مورد', icon: '🤝', fields: [['name', 'اسم المورد', 1], ['phone', 'الهاتف'], ['email', 'البريد'], ['address', 'العنوان'], ['balance', 'الرصيد الافتتاحي', 'money']] },
+  products: { key: 'products', title: 'المخزون والأصناف', single: 'صنف', icon: '🏬', fields: [['name', 'اسم الصنف', 1], ['cat', 'التصنيف'], ['emoji', 'الرمز'], ['barcode', 'الباركود'], ['price', 'سعر البيع', 'money'], ['cost', 'التكلفة', 'money'], ['qty', 'الكمية', 'num'], ['min', 'حد الطلب', 'num']] },
+  employees: { key: 'employees', title: 'الموظفون', single: 'موظف', icon: '🧑‍💼', fields: [['name', 'اسم الموظف', 1], ['role', 'الوظيفة'], ['phone', 'الهاتف'], ['salary', 'الراتب', 'money'], ['hire', 'تاريخ التعيين', 'date']] }
+};
+
+function entityForm(k, item = {}) {
+  const c = ENT[k];
+  return '<div class="frm c2">' + c.fields.map(f => {
+    const [kk, l, t] = f; const v = item[kk] ?? '';
+    if (t === 'money' || t === 'num') return fNum(kk, l, v);
+    if (t === 'date') return fDate(kk, l, v);
+    return fText(kk, l, v, kk === 'name');
+  }).join('') + '</div>';
+}
+
+function saveEntity(k, id) {
+  const c = ENT[k];
+  const obj = id ? DB[k].find(x => x.id === id) : { id: uid(), createdAt: Date.now() };
+  for (const f of c.fields) {
+    const v = $('#f_' + f[0])?.value;
+    if (f[0] === 'name' && !v?.trim()) return toast('الاسم مطلوب', 'err');
+    obj[f[0]] = (f[2] === 'money' || f[2] === 'num') ? (+v || 0) : (v || '').trim();
+  }
+  if (!id) DB[k].push(obj);
+  saveDB(); closeModal(); render(); toast('تم الحفظ ✓');
+  addAudit(id ? 'تعديل ' + c.single : 'إضافة ' + c.single, obj.name);
+}
+
+function delItem(k, id) {
+  if (!confirm('تأكيد الحذف؟')) return;
+  const item = DB[k]?.find(x => x.id === id);
+  DB[k] = DB[k].filter(x => x.id !== id);
+  saveDB(); render(); toast('تم الحذف');
+  addAudit('حذف ' + ENT[k].single, item?.name || '');
+}
+
+window.entEdit = (k, id) => {
+  const item = id ? DB[k]?.find(x => x.id === id) : {};
+  openModal((id ? 'تعديل ' : 'إضافة ') + ENT[k].single, entityForm(k, item || {}), () => saveEntity(k, id));
+};
+
+function entityPage(k) {
+  const c = ENT[k]; const rows = DB[k] || [];
+  const head = c.fields.map(f => `<th>${f[1]}</th>`).join('') + '<th style="width:90px">إجراءات</th>';
+  const body = rows.map(r => `<tr>${c.fields.map(f => {
+    let v = r[f[0]];
+    if (f[2] === 'money') v = money(v);
+    if (k === 'products' && f[0] === 'qty') v = `${fmt(v)} ${v <= r.min ? '<span class="tag warn">منخفض</span>' : '<span class="tag ok">متوفر</span>'}`;
+    return `<td>${esc(v)}</td>`;
+  }).join('')}
+    <td><div class="row-actions"><button class="mini" onclick="entEdit('${k}','${r.id}')">✏️</button><button class="mini del" onclick="delItem('${k}','${r.id}')">🗑</button></div></td></tr>`).join('');
+  return `<div class="page-head"><h1>${c.icon} ${c.title}</h1><span class="tag accent">${rows.length} سجل</span><span class="sp"></span>
+    <button class="btn" onclick="entEdit('${k}')">+ إضافة ${c.single}</button></div>
+    <div class="card" style="padding:0">${rows.length ? `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`
+      : '<div class="empty"><div class="big">📭</div>لا توجد سجلات بعد. ابدأ بإضافة أول ' + c.single + '.</div>'}</div>`;
+}
+
+const money = n => fmt(n) + ' ' + (DB?.settings?.currency || 'ر.س');
+
+// ===== POS =====
+let POS_CART = [];
+function posPage() {
+  const cats = [...new Set((DB.products || []).map(p => p.cat))];
+  return `<div class="page-head"><h1>🛒 نقاط البيع</h1><span class="sp"></span>
+    <div class="search-box"><input id="posSearch" placeholder="بحث أو باركود..." oninput="filterPOS(this.value)"></div></div>
+  <div class="pos-layout">
+    <div class="pos-products">
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn xs ghost" onclick="filterPOSCat('all')">الكل</button>
+        ${cats.map(c => `<button class="btn xs ghost" onclick="filterPOSCat('${c}')">${c}</button>`).join('')}
+      </div>
+      <div class="pos-grid" id="posGrid">${(DB.products || []).map(p => `
+        <div class="pos-item" data-cat="${p.cat}" data-name="${p.name}" onclick="addToPOS('${p.id}')">
+          <div class="emoji">${p.emoji || '📦'}</div>
+          <div class="name">${esc(p.name)}</div>
+          <div class="price">${money(p.price)}</div>
+          <div class="qty">متوفر: ${fmt(p.qty)}</div>
+        </div>`).join('') || '<div class="empty" style="grid-column:1/-1"><div class="big">🏬</div>لا توجد أصناف. أضف أصنافاً من قسم المخزون أولاً.</div>'}
+      </div>
+    </div>
+    <div class="pos-cart">
+      <div class="pos-cart-head"><span>🧾 السلة</span><button class="btn xs danger" onclick="clearPOS()">مسح</button></div>
+      <div class="pos-cart-items" id="posCartItems"></div>
+      <div class="pos-cart-foot">
+        <div class="pos-barcode"><input id="posBarcode" placeholder="امسح الباركود..." onkeydown="if(event.key==='Enter')scanPOS(this.value)"><button class="btn sm" onclick="scanPOS($('#posBarcode')?.value)">📷</button></div>
+        <div class="pos-total"><span>الإجمالي:</span><span id="posTotal">0 ${DB?.settings?.currency || ''}</span></div>
+        <button class="btn success" style="width:100%;justify-content:center" onclick="checkoutPOS()">✅ إتمام البيع</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function addToPOS(pid) {
+  const p = DB.products?.find(x => x.id === pid); if (!p) return;
+  const ex = POS_CART.find(x => x.productId === pid);
+  if (ex) { ex.qty++; } else { POS_CART.push({ productId: pid, name: p.name, price: p.price, qty: 1 }); }
+  renderPOSCart();
+}
+
+function renderPOSCart() {
+  const el = $('#posCartItems'); if (!el) return;
+  el.innerHTML = POS_CART.map((item, i) => `<div class="pos-cart-item">
+    <span>${esc(item.name)}</span>
+    <div class="qty-ctrl"><button onclick="posQty(${i},-1)">−</button><span>${item.qty}</span><button onclick="posQty(${i},1)">+</button></div>
+    <span class="total">${money(item.price * item.qty)}</span>
+    <span class="del-item" onclick="posRemove(${i})">✕</span></div>`).join('') || '<div class="empty" style="padding:20px">السلة فارغة</div>';
+  const total = POS_CART.reduce((a, i) => a + i.price * i.qty, 0);
+  const totEl = $('#posTotal');
+  if (totEl) totEl.textContent = money(total);
+}
+
+function posQty(i, d) { POS_CART[i].qty = Math.max(1, POS_CART[i].qty + d); renderPOSCart(); }
+function posRemove(i) { POS_CART.splice(i, 1); renderPOSCart(); }
+function clearPOS() { POS_CART = []; renderPOSCart(); }
+function filterPOS(q) { $$('.pos-item').forEach(el => { el.style.display = el.dataset.name?.includes(q) ? '' : 'none'; }); }
+function filterPOSCat(cat) { $$('.pos-item').forEach(el => { el.style.display = (cat === 'all' || el.dataset.cat === cat) ? '' : 'none'; }); }
+
+function scanPOS(code) {
+  const p = DB.products?.find(x => x.barcode === code?.trim());
+  if (p) { addToPOS(p.id); const b = $('#posBarcode'); if (b) b.value = ''; toast('تم إضافة: ' + p.name); }
+  else toast('باركود غير موجود', 'err');
+}
+
+function checkoutPOS() {
+  if (!POS_CART.length) return toast('السلة فارغة', 'err');
+  const sub = POS_CART.reduce((a, i) => a + i.price * i.qty, 0);
+  const tax = sub * (DB.settings?.taxRate || 0) / 100;
+  const total = sub + tax;
+  const num = 'POS-' + String(DB.counters?.sale || 1).padStart(4, '0');
+  if (DB.counters) DB.counters.sale++;
+
+  POS_CART.forEach(item => { const p = DB.products?.find(x => x.id === item.productId); if (p) p.qty -= item.qty; });
+
+  if (!DB.sales) DB.sales = [];
+  DB.sales.push({
+    id: uid(), number: num, date: today(), partyId: null,
+    items: POS_CART.map(i => ({ productId: i.productId, name: i.name, qty: i.qty, price: i.price })),
+    discount: 0, taxRate: DB.settings?.taxRate || 0, subtotal: sub, total, status: 'completed', createdAt: Date.now()
+  });
+
+  if (!DB.transactions) DB.transactions = [];
+  DB.transactions.push({ id: uid(), date: today(), type: 'income', amount: total, desc: 'بيع POS ' + num, createdAt: Date.now() });
+
+  POS_CART = []; saveDB(); render(); notify('تم بيع ' + num + ' بمبلغ ' + money(total), 'sale');
+  addAudit('بيع POS', num + ' - ' + money(total)); toast('تم إتمام البيع ✓ ' + money(total));
+}
+
+// ===== الفواتير =====
+function invCfg(type) {
+  return type === 'sale'
+    ? { title: 'المبيعات', single: 'فاتورة بيع', icon: '📋', db: 'sales', party: 'customers', partyL: 'العميل', pre: 'INV', sign: -1 }
+    : { title: 'المشتريات', single: 'فاتورة شراء', icon: '📦', db: 'purchases', party: 'suppliers', partyL: 'المورد', pre: 'PUR', sign: 1 };
+}
+
+function invoiceListPage(type) {
+  const c = invCfg(type); const list = (DB[c.db] || []).slice().reverse();
+  const body = list.map(inv => {
+    const p = DB[c.party]?.find(x => x.id === inv.partyId);
+    return `<tr><td><b>${inv.number}</b></td><td>${inv.date}</td><td>${esc(p ? p.name : 'عميل نقدي')}</td>
+    <td>${inv.items?.length || 0} صنف</td><td><b>${money(inv.total)}</b></td><td><span class="tag ok">مكتمل</span></td>
+    <td><div class="row-actions"><button class="mini" onclick="viewInv('${type}','${inv.id}')">👁</button>
+    <button class="mini del" onclick="delInv('${type}','${inv.id}')">🗑</button></div></td></tr>`;
+  }).join('');
+  return `<div class="page-head"><h1>${c.icon} ${c.title}</h1><span class="tag accent">${list.length} فاتورة</span><span class="sp"></span>
+    <button class="btn" onclick="newInvoice('${type}')">+ ${c.single} جديدة</button></div>
+    <div class="card" style="padding:0">${list.length ? `<div class="table-wrap"><table><thead><tr>
+    <th>الرقم</th><th>التاريخ</th><th>${c.partyL}</th><th>الأصناف</th><th>الإجمالي</th><th>الحالة</th><th style="width:90px">إجراءات</th></tr></thead><tbody>${body}</tbody></table></div>`
+      : '<div class="empty"><div class="big">🧾</div>لا توجد فواتير بعد</div>'}</div>`;
+}
+
+window.newInvoice = type => {
+  const c = invCfg(type);
+  const opts = (DB[c.party] || []).map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  openModal(c.single + ' جديدة', `<div class="frm c2">
+    <div class="fg"><label>${c.partyL}</label><select id="inv_party"><option value="">عميل نقدي</option>${opts}</select></div>${fDate('inv_date', 'التاريخ')}</div>
+    <label style="margin-top:14px">الأصناف</label><div id="inv_items"></div>
+    <button class="btn ghost sm" onclick="addInvRow()">+ صنف</button>
+    <div class="frm c2" style="margin-top:14px">${fNum('inv_disc', 'الخصم', 0)}${fNum('inv_tax', 'الضريبة %', DB.settings?.taxRate || 15)}</div>
+    <div class="inv-sum"><div class="ln"><span>الفرعي</span><span id="inv_sub">0</span></div>
+    <div class="ln"><span>الخصم</span><span id="inv_discv">0</span></div>
+    <div class="ln"><span>الضريبة</span><span id="inv_taxv">0</span></div>
+    <div class="ln tot"><span>الإجمالي</span><span id="inv_total">0</span></div></div>`,
+    () => saveInvoice(type));
+  addInvRow();
+  $('#inv_disc')?.addEventListener('input', calcInv);
+  $('#inv_tax')?.addEventListener('input', calcInv);
+};
+
+window.addInvRow = () => {
+  if (!(DB.products || []).length) return toast('أضف أصنافاً أولاً من قسم المخزون', 'err');
+  const opts = DB.products.map(p => `<option value="${p.id}">${esc(p.name)} (${fmt(p.qty)})</option>`).join('');
+  const d = document.createElement('div'); d.className = 'inv-row';
+  d.innerHTML = `<select class="ip" onchange="rowProd(this)"><option value="">اختر صنفاً</option>${opts}</select>
+  <input type="number" class="iq" min="1" value="1" oninput="calcInv()"><input type="number" class="ipr" min="0" step="0.01" placeholder="السعر" oninput="calcInv()">
+  <button class="ibtn" onclick="this.parentElement.remove();calcInv()">✕</button>`;
+  $('#inv_items')?.appendChild(d); calcInv();
+};
+
+window.rowProd = sel => { const p = DB.products?.find(x => x.id === sel.value); if (p) sel.closest('.inv-row')?.querySelector('.ipr')?.value = p.price; calcInv(); };
+
+window.calcInv = () => {
+  let sub = 0; $$('.inv-row').forEach(r => { sub += (+r.querySelector('.iq')?.value || 0) * (+r.querySelector('.ipr')?.value || 0); });
+  const disc = +($('#inv_disc')?.value || 0), tax = +($('#inv_tax')?.value || 0), after = Math.max(sub - disc, 0), tv = after * tax / 100;
+  if ($('#inv_sub')) { $('#inv_sub').textContent = money(sub); $('#inv_discv').textContent = money(disc); $('#inv_taxv').textContent = money(tv); $('#inv_total').textContent = money(after + tv); }
+};
+
+function saveInvoice(type) {
+  const c = invCfg(type);
+  const partyId = $('#inv_party')?.value;
+  const rows = $$('.inv-row').map(r => ({
+    productId: r.querySelector('.ip')?.value,
+    name: DB.products?.find(p => p.id === r.querySelector('.ip')?.value)?.name || '',
+    qty: +r.querySelector('.iq')?.value || 0,
+    price: +r.querySelector('.ipr')?.value || 0
+  })).filter(r => r.productId && r.qty > 0);
+
+  if (!rows.length) return toast('أضف صنفاً واحداً على الأقل', 'err');
+  const sub = rows.reduce((a, r) => a + r.qty * r.price, 0), disc = +$('#inv_disc')?.value || 0, tax = +$('#inv_tax')?.value || 0;
+  const after = Math.max(sub - disc, 0), total = after + after * tax / 100;
+  const counterKey = type === 'sale' ? 'sale' : 'purchase';
+  const num = c.pre + '-' + String(DB.counters?.[counterKey] || 1).padStart(4, '0');
+  if (DB.counters) DB.counters[counterKey]++;
+
+  rows.forEach(r => { const p = DB.products?.find(x => x.id === r.productId); if (p) { p.qty += c.sign * r.qty; if (type === 'purchase') p.cost = r.price; } });
+
+  if (!DB[c.db]) DB[c.db] = [];
+  DB[c.db].push({ id: uid(), number: num, date: $('#inv_date')?.value || today(), partyId, items: rows, discount: disc, taxRate: tax, subtotal: sub, total, status: 'completed', createdAt: Date.now() });
+
+  if (!DB.transactions) DB.transactions = [];
+  DB.transactions.push({ id: uid(), date: today(), type: type === 'sale' ? 'income' : 'expense', amount: total, desc: (type === 'sale' ? 'مبيعات ' : 'شراء ') + num, createdAt: Date.now() });
+
+  saveDB(); closeModal(); render(); notify('فاتورة ' + num + ' - ' + money(total), type);
+  addAudit(type === 'sale' ? 'فاتورة بيع' : 'فاتورة شراء', num); toast('تم حفظ ' + num + ' ✓');
+}
+
+window.viewInv = (type, id) => {
+  const c = invCfg(type); const inv = DB[c.db]?.find(x => x.id === id); if (!inv) return;
+  const p = DB[c.party]?.find(x => x.id === inv.partyId);
+  openModal('فاتورة ' + inv.number, `<div style="font-size:.85rem;margin-bottom:12px"><b>${esc(DB.settings?.companyName)}</b> | التاريخ: ${inv.date} | ${c.partyL}: ${esc(p ? p.name : 'نقدي')}</div>
+  <div class="table-wrap"><table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>
+  ${(inv.items || []).map(i => `<tr><td>${esc(i.name)}</td><td>${fmt(i.qty)}</td><td>${money(i.price)}</td><td>${money(i.qty * i.price)}</td></tr>`).join('')}</tbody></table></div>
+  <div class="inv-sum"><div class="ln tot"><span>الإجمالي النهائي</span><span>${money(inv.total)}</span></div></div>`, () => window.print(), 'طباعة');
+};
+
+window.delInv = (type, id) => {
+  if (!confirm('حذف الفاتورة؟')) return;
+  const c = invCfg(type); DB[c.db] = (DB[c.db] || []).filter(x => x.id !== id); saveDB(); render(); toast('تم الحذف');
+};
+
+// ===== المحاسبة =====
+function accountingPage() {
+  const list = (DB.transactions || []).slice().reverse();
+  const inc = list.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0);
+  const exp = list.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0);
+  const body = list.map(t => `<tr><td>${t.date}</td><td><span class="tag ${t.type === 'income' ? 'ok' : 'bad'}">${t.type === 'income' ? '↓ إيراد' : '↑ مصروف'}</span></td>
+  <td>${esc(t.desc)}</td><td style="color:${t.type === 'income' ? 'var(--success)' : 'var(--danger)'};font-weight:700">${money(t.amount)}</td>
+  <td><button class="mini del" onclick="delTxn('${t.id}')">🗑</button></td></tr>`).join('');
+  return `<div class="page-head"><h1>💰 المحاسبة</h1><span class="sp"></span><button class="btn" onclick="newTxn()">+ قيد يدوي</button></div>
+  <div class="grid kpis" style="margin-bottom:16px">
+    <div class="card kpi"><div class="ic">📈</div><div><h3 style="color:var(--success)">${money(inc)}</h3><p>الإيرادات</p></div></div>
+    <div class="card kpi"><div class="ic">📉</div><div><h3 style="color:var(--danger)">${money(exp)}</h3><p>المصروفات</p></div></div>
+    <div class="card kpi"><div class="ic">⚖️</div><div><h3>${money(inc - exp)}</h3><p>صافي الربح</p></div></div></div>
+  <div class="card" style="padding:0">${list.length ? `<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>البيان</th><th>المبلغ</th><th></th></tr></thead><tbody>${body}</tbody></table></div>` : '<div class="empty"><div class="big">💰</div>لا توجد معاملات بعد</div>'}</div>`;
+}
+
+window.newTxn = () => openModal('قيد يدوي', `<div class="frm c2">
+  <div class="fg"><label>النوع</label><select id="f_type"><option value="income">إيراد</option><option value="expense">مصروف</option></select></div>
+  ${fDate('date', 'التاريخ')}${fNum('amount', 'المبلغ', 0)}<div class="fg full"><label>البيان</label><input id="f_desc"></div></div>`,
+  () => {
+    const a = +$('#f_amount')?.value; if (a <= 0) return toast('أدخل مبلغاً صحيحاً', 'err');
+    if (!DB.transactions) DB.transactions = [];
+    DB.transactions.push({ id: uid(), date: $('#f_date')?.value || today(), type: $('#f_type')?.value, amount: a, desc: $('#f_desc')?.value || 'قيد يدوي', createdAt: Date.now() });
+    saveDB(); closeModal(); render(); addAudit('قيد محاسبي', $('#f_desc')?.value); toast('تم ✓');
+  });
+
+window.delTxn = id => { if (!confirm('حذف؟')) return; DB.transactions = (DB.transactions || []).filter(t => t.id !== id); saveDB(); render(); };
+
+// ===== المشاريع =====
+function projectsPage() {
+  const list = DB.projects || [];
+  return `<div class="page-head"><h1>📁 إدارة المشاريع</h1><span class="tag accent">${list.length} مشروع</span><span class="sp"></span>
+  <button class="btn" onclick="newProject()">+ مشروع جديد</button></div>
+  ${list.length ? `<div class="proj-grid">${list.map(p => {
+    const c = DB.customers?.find(x => x.id === p.client);
+    return `<div class="proj-card"><div class="proj-header"><span class="proj-title">${esc(p.name)}</span>
+    <span class="tag ${p.status === 'active' ? 'ok' : 'warn'}">${p.status === 'active' ? 'نشط' : 'مكتمل'}</span></div>
+    <div class="proj-desc">العميل: ${esc(c ? c.name : '—')}</div>
+    <div class="proj-progress"><div class="bar" style="width:${p.progress}%"></div></div>
+    <div class="proj-meta"><span>التقدم: ${p.progress}%</span><span>المهام: ${p.done}/${p.tasks}</span></div>
+    <div class="proj-meta" style="margin-top:6px"><span>الميزانية: ${money(p.budget)}</span><span>المصروف: ${money(p.spent)}</span></div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn xs ghost" onclick="editProject('${p.id}')">✏️ تعديل</button>
+      <button class="btn xs danger" onclick="delProject('${p.id}')">🗑</button></div></div>`;
+  }).join('')}</div>` : '<div class="empty"><div class="big">📁</div>لا توجد مشاريع بعد</div>'}`;
+}
+
+window.newProject = () => openModal('مشروع جديد', `<div class="frm c2">${fText('name', 'اسم المشروع', '', 1)}
+  ${fSelect('client', 'العميل', (DB.customers || []).map(c => [c.id, c.name]))}${fNum('budget', 'الميزانية', 0)}
+  ${fNum('tasks', 'عدد المهام', 10)}${fDate('start', 'تاريخ البدء')}${fDate('end', 'تاريخ الانتهاء')}</div>`,
+  () => {
+    const n = $('#f_name')?.value?.trim(); if (!n) return toast('الاسم مطلوب', 'err');
+    if (!DB.projects) DB.projects = [];
+    DB.projects.push({ id: uid(), name: n, client: $('#f_client')?.value, budget: +$('#f_budget')?.value || 0, spent: 0, progress: 0, status: 'active', start: $('#f_start')?.value, end: $('#f_end')?.value, tasks: +$('#f_tasks')?.value || 0, done: 0 });
+    saveDB(); closeModal(); render(); addAudit('مشروع جديد', n); toast('تم ✓');
+  });
+
+window.editProject = id => {
+  const p = DB.projects?.find(x => x.id === id); if (!p) return;
+  openModal('تعديل المشروع', `<div class="frm c2">${fText('name', 'الاسم', p.name, 1)}${fNum('progress', 'نسبة الإنجاز %', p.progress)}
+  ${fNum('spent', 'المصروف', p.spent)}${fNum('done', 'المهام المنجزة', p.done)}
+  <div class="fg"><label>الحالة</label><select id="f_status"><option value="active" ${p.status === 'active' ? 'selected' : ''}>نشط</option><option value="done" ${p.status === 'done' ? 'selected' : ''}>مكتمل</option></select></div></div>`,
+  () => {
+    p.name = $('#f_name')?.value; p.progress = +$('#f_progress')?.value; p.spent = +$('#f_spent')?.value; p.done = +$('#f_done')?.value; p.status = $('#f_status')?.value;
+    saveDB(); closeModal(); render(); toast('تم التحديث ✓');
+  });
+};
+
+window.delProject = id => { if (!confirm('حذف المشروع؟')) return; DB.projects = (DB.projects || []).filter(p => p.id !== id); saveDB(); render(); };
+
+// ===== الأصول =====
+function assetsPage() {
+  const list = DB.assets || [];
+  return `<div class="page-head"><h1>🏗 الأصول الثابتة</h1><span class="tag accent">${list.length} أصل</span><span class="sp"></span>
+  <button class="btn" onclick="newAsset()">+ أصل جديد</button></div>
+  ${list.length ? `<div class="card" style="padding:0"><div class="table-wrap"><table><thead><tr><th>الأصل</th><th>التصنيف</th><th>التكلفة</th><th>تاريخ الشراء</th><th>العمر (سنوات)</th><th>الإهلاك السنوي</th><th>القيمة الحالية</th><th></th></tr></thead><tbody>
+  ${list.map(a => {
+    const years = (new Date() - new Date(a.purchase)) / (365 * 24 * 3600 * 1000);
+    const annual = a.cost / a.life; const current = Math.max(a.cost - annual * years, 0);
+    return `<tr><td><b>${esc(a.name)}</b></td><td>${esc(a.cat)}</td><td>${money(a.cost)}</td><td>${a.purchase}</td><td>${a.life}</td>
+    <td>${money(annual)}</td><td style="font-weight:700;color:var(--success)">${money(current)}</td>
+    <td><button class="mini del" onclick="delAsset('${a.id}')">🗑</button></td></tr>`;
+  }).join('')}</tbody></table></div></div>` : '<div class="empty"><div class="big">🏗</div>لا توجد أصول بعد</div>'}`;
+}
+
+window.newAsset = () => openModal('أصل جديد', `<div class="frm c2">${fText('name', 'اسم الأصل', '', 1)}${fText('cat', 'التصنيف')}
+  ${fNum('cost', 'التكلفة', 0)}${fDate('purchase', 'تاريخ الشراء')}${fNum('life', 'العمر الافتراضي (سنوات)', 5)}</div>`,
+  () => {
+    const n = $('#f_name')?.value?.trim(); if (!n) return toast('الاسم مطلوب', 'err');
+    if (!DB.assets) DB.assets = [];
+    DB.assets.push({ id: uid(), name: n, cat: $('#f_cat')?.value, cost: +$('#f_cost')?.value || 0, purchase: $('#f_purchase')?.value, life: +$('#f_life')?.value || 5, depreciation: 'straight' });
+    saveDB(); closeModal(); render(); toast('تم ✓');
+  });
+
+window.delAsset = id => { if (!confirm('حذف؟')) return; DB.assets = (DB.assets || []).filter(a => a.id !== id); saveDB(); render(); };
+
+// ===== سير العمل =====
+function workflowsPage() {
+  const list = DB.workflows || [];
+  return `<div class="page-head"><h1>✅ سير العمل والموافقات</h1><span class="sp"></span><button class="btn" onclick="newWorkflow()">+ طلب جديد</button></div>
+  <div class="grid kpis" style="margin-bottom:16px">
+    <div class="card kpi"><div class="ic">⏳</div><div><h3>${list.filter(w => w.status === 'pending').length}</h3><p>بانتظار الموافقة</p></div></div>
+    <div class="card kpi"><div class="ic">✅</div><div><h3>${list.filter(w => w.status === 'approved').length}</h3><p>تمت الموافقة</p></div></div>
+    <div class="card kpi"><div class="ic">❌</div><div><h3>${list.filter(w => w.status === 'rejected').length}</h3><p>مرفوض</p></div></div></div>
+  ${list.length ? list.map(w => `<div class="wf-item">
+    <div class="wf-icon" style="background:color-mix(in srgb,var(--accent) 12%,transparent)">${w.type === 'purchase' ? '🛒' : w.type === 'leave' ? '🏖' : '💸'}</div>
+    <div class="wf-info"><b>${esc(w.title)}</b><small>بواسطة: ${esc(w.by)} | ${w.date}${w.amount ? ' | ' + money(w.amount) : ''}</small></div>
+    <span class="wf-status ${w.status}">${w.status === 'pending' ? '⏳ معلق' : w.status === 'approved' ? '✅ موافق' : '❌ مرفوض'}</span>
+    ${w.status === 'pending' ? `<div class="row-actions"><button class="mini" onclick="approveWF('${w.id}')" title="موافقة">✓</button><button class="mini del" onclick="rejectWF('${w.id}')" title="رفض">✕</button></div>` : ''}
+  </div>`).join('') : '<div class="empty"><div class="big">✅</div>لا توجد طلبات بعد</div>'}`;
+}
+
+window.newWorkflow = () => openModal('طلب جديد', `<div class="frm c2">
+  <div class="fg"><label>نوع الطلب</label><select id="f_type"><option value="purchase">طلب شراء</option><option value="leave">طلب إجازة</option><option value="expense">مصروف</option></select></div>
+  ${fText('title', 'عنوان الطلب', '', 1)}${fNum('amount', 'المبلغ (إن وجد)', 0)}
+  ${fText('approver', 'المعتمد', 'مدير النظام')}</div>`,
+  () => {
+    const t = $('#f_title')?.value?.trim(); if (!t) return toast('العنوان مطلوب', 'err');
+    if (!DB.workflows) DB.workflows = [];
+    DB.workflows.unshift({ id: uid(), type: $('#f_type')?.value, title: t, amount: +$('#f_amount')?.value || 0, by: CURRENT_USER?.name || 'غير معروف', date: today(), status: 'pending', approver: $('#f_approver')?.value });
+    saveDB(); closeModal(); render(); notify('طلب جديد: ' + t, 'workflow'); toast('تم إرسال الطلب ✓');
+  });
+
+window.approveWF = id => { const w = DB.workflows?.find(x => x.id === id); if (w) { w.status = 'approved'; saveDB(); render(); notify('تمت الموافقة على: ' + w.title, 'workflow'); addAudit('موافقة', w.title); toast('تمت الموافقة ✓'); } };
+window.rejectWF = id => { const w = DB.workflows?.find(x => x.id === id); if (w) { w.status = 'rejected'; saveDB(); render(); notify('تم رفض: ' + w.title, 'workflow'); toast('تم الرفض'); } };
+
+// ===== التقارير =====
+function reportsPage() {
+  return `<div class="page-head"><h1>📈 التقارير والتحليلات</h1><span class="sp"></span>
+  <button class="btn ghost" onclick="exportCSV()">⬇️ تصدير CSV</button></div>
+  <div class="grid cols-2">
+    <div class="card"><h2>📊 المبيعات — آخر ٦ أشهر</h2><canvas id="ch1"></canvas></div>
+    <div class="card"><h2>💰 الإيرادات مقابل المصروفات</h2><canvas id="ch2"></canvas></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h2>🏆 الأصناف الأكثر مبيعاً</h2>
+  <div class="table-wrap"><table><thead><tr><th>#</th><th>الصنف</th><th>الكمية المباعة</th><th>الإيراد</th></tr></thead><tbody>
+  ${getTopProducts().map((t, i) => `<tr><td>${i + 1}</td><td>${esc(t.name)}</td><td><b>${fmt(t.qty)}</b></td><td>${money(t.rev)}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">لا بيانات بعد</td></tr>'}
+  </tbody></table></div></div>`;
+}
+
+function getTopProducts() {
+  const map = {};
+  (DB.sales || []).forEach(s => (s.items || []).forEach(i => { if (!map[i.name]) map[i.name] = { name: i.name, qty: 0, rev: 0 }; map[i.name].qty += i.qty; map[i.name].rev += i.qty * i.price; }));
+  return Object.values(map).sort((a, b) => b.rev - a.rev).slice(0, 8);
+}
+
+function exportCSV() {
+  let csv = '\ufeffالنوع,التاريخ,البيان,المبلغ\n';
+  (DB.transactions || []).forEach(t => { csv += `${t.type === 'income' ? 'إيراد' : 'مصروف'},${t.date},"${(t.desc || '').replace(/"/g, '""')}",${t.amount}\n`; });
+  const b = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'report-' + today() + '.csv'; a.click();
+  toast('تم التصدير ✓');
+}
+
+// ===== سجل النشاط =====
+function auditPage() {
+  return `<div class="page-head"><h1>📋 سجل النشاط والتدقيق</h1><span class="tag accent">${(DB.audit || []).length} حدث</span></div>
+  <div class="card">${(DB.audit || []).slice(0, 50).map(a => `<div class="audit-item">
+    <div class="audit-dot" style="background:var(--accent)"></div>
+    <div><b>${esc(a.action)}</b> ${a.detail ? '— ' + esc(a.detail) : ''}<div class="time">${esc(a.user)} • ${new Date(a.time).toLocaleString('ar')}</div></div></div>`).join('') || '<div class="empty">لا يوجد نشاط بعد</div>'}</div>`;
+}
+
+// ===== لوحة التحكم =====
+function dashPage() {
+  const isEmpty = !DB.products?.length && !DB.customers?.length && !DB.sales?.length;
+  
+  if (isEmpty) {
+    return `<div class="page-head"><h1>مرحباً ${CURRENT_USER ? CURRENT_USER.name : ''} 👋</h1></div>
+    <div class="card" style="text-align:center;padding:60px 20px">
+      <div style="font-size:4rem;margin-bottom:20px">🚀</div>
+      <h2 style="font-size:1.3rem;margin-bottom:10px">نظامك جاهز للانطلاق!</h2>
+      <p style="color:var(--muted);margin-bottom:30px;max-width:500px;margin-inline:auto">
+        ابدأ بإضافة بياناتك الأساسية لتحقيق أقصى استفادة من النظام
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn" onclick="go('inventory')">🏬 إضافة الأصناف</button>
+        <button class="btn ghost" onclick="go('customers')">👥 إضافة العملاء</button>
+        <button class="btn ghost" onclick="go('suppliers')">🤝 إضافة الموردين</button>
+        <button class="btn ghost" onclick="go('settings')">⚙️ تخصيص النظام</button>
+      </div>
+    </div>`;
+  }
+  
+  const rev = (DB.sales || []).reduce((a, i) => a + i.total, 0);
+  const purch = (DB.purchases || []).reduce((a, i) => a + i.total, 0);
+  const txIn = (DB.transactions || []).filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0);
+  const txOut = (DB.transactions || []).filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0);
+  const low = (DB.products || []).filter(p => p.qty <= p.min);
+  const pending = (DB.workflows || []).filter(w => w.status === 'pending').length;
+  
+  return `<div class="page-head"><h1>مرحباً ${CURRENT_USER ? CURRENT_USER.name : ''} 👋</h1><span class="sp"></span>
+  <button class="btn ghost sm" onclick="go('pos')">🛒 نقاط البيع</button><button class="btn sm" onclick="newInvoice('sale')">+ فاتورة</button></div>
+  <div class="grid kpis">
+    <div class="card kpi"><div class="ic">💵</div><div><h3>${money(rev)}</h3><p>إجمالي المبيعات</p></div></div>
+    <div class="card kpi"><div class="ic">🛍</div><div><h3>${money(purch)}</h3><p>المشتريات</p></div></div>
+    <div class="card kpi"><div class="ic">⚖️</div><div><h3 style="color:${txIn - txOut >= 0 ? 'var(--success)' : 'var(--danger)'}">${money(txIn - txOut)}</h3><p>صافي الربح</p></div></div>
+    <div class="card kpi"><div class="ic">📋</div><div><h3>${(DB.sales || []).length}</h3><p>الفواتير</p></div></div>
+    <div class="card kpi"><div class="ic">📁</div><div><h3>${(DB.projects || []).length}</h3><p>المشاريع النشطة</p></div></div>
+    <div class="card kpi"><div class="ic">⏳</div><div><h3 style="color:var(--warning)">${pending}</h3><p>بانتظار الموافقة</p></div></div>
+  </div>
+  <div class="grid cols-2" style="margin-top:16px">
+    <div class="card"><h2>📈 المبيعات الشهرية</h2><canvas id="ch1"></canvas></div>
+    <div class="card"><h2>⚠️ تنبيهات المخزون</h2>${low.length ? `<div class="table-wrap"><table><thead><tr><th>الصنف</th><th>المتبقي</th><th>الحد</th></tr></thead><tbody>
+    ${low.slice(0, 6).map(p => `<tr><td>${esc(p.name)}</td><td><span class="tag warn">${fmt(p.qty)}</span></td><td>${fmt(p.min)}</td></tr>`).join('')}</tbody></table></div>`
+      : '<div class="empty"><div class="big">✅</div>المخزون جيد</div>'}</div>
+  </div>
+  <div class="card" style="margin-top:16px"><h2>🕐 آخر المعاملات</h2><div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>البيان</th><th>المبلغ</th></tr></thead><tbody>
+  ${(DB.transactions || []).slice(-8).reverse().map(t => `<tr><td>${t.date}</td><td><span class="tag ${t.type === 'income' ? 'ok' : 'bad'}">${t.type === 'income' ? 'إيراد' : 'مصروف'}</span></td><td>${esc(t.desc)}</td><td>${money(t.amount)}</td></tr>`).join('')}</tbody></table></div></div>`;
+}
+
+// ===== الإعدادات =====
+function settingsPage() {
+  const s = DB.settings || {};
+  const colors = ['#6c5ce7', '#00b894', '#0984e3', '#e17055', '#d63031', '#e84393', '#fdcb6e', '#00cec9'];
+  const mods = [
+    ['pos', 'نقاط البيع'], ['sales', 'المبيعات'], ['purchases', 'المشتريات'],
+    ['inventory', 'المخزون'], ['customers', 'العملاء'], ['suppliers', 'الموردون'],
+    ['hr', 'الموظفون'], ['accounting', 'المحاسبة'], ['projects', 'المشاريع'],
+    ['assets', 'الأصول'], ['workflows', 'سير العمل'], ['reports', 'التقارير']
+  ];
+  return `<div class="page-head"><h1>⚙️ إعدادات النظام</h1><span class="sp"></span><button class="btn" onclick="saveSettings()">💾 حفظ الإعدادات</button></div>
+  <div class="set-grid">
+    <div class="card"><h2>🏢 المعلومات العامة</h2><div class="frm">
+    ${fText('s_name', 'اسم الشركة', s.companyName)}
+    <div class="frm c2"><div class="fg"><label>العملة</label><input id="s_cur" value="${esc(s.currency)}" list="curs"><datalist id="curs"><option>ر.س</option><option>د.إ</option><option>USD $</option><option>€</option></datalist></div>
+    ${fNum('s_tax', 'الضريبة %', s.taxRate)}</div></div></div>
+    <div class="card"><h2>🎨 المظهر</h2><div class="frm">
+    <div class="fg"><label>اللون الرئيسي</label><div class="swatches">${[...new Set(colors)].map(c => `<div class="sw ${s.accent === c ? 'on' : ''}" style="background:${c}" onclick="pickColor('${c}',this)"></div>`).join('')}
+    <input type="color" id="s_accent" value="${s.accent}" style="width:40px;height:32px"></div></div>
+    <div class="switch-row"><span>الوضع الفاتح</span><label class="switch"><input type="checkbox" id="s_theme" ${s.theme === 'light' ? 'checked' : ''}><i></i></label></div>
+    <div class="fg"><label>حجم الخط: <span id="fsVal">${parseInt(s.fontSize)}px</span></label><input type="range" id="s_fs" min="13" max="18" value="${parseInt(s.fontSize)}" oninput="fsVal.textContent=this.value+'px'"></div>
+    <div class="fg"><label>الاستدارة</label><select id="s_rad"><option value="8px" ${s.radius === '8px' ? 'selected' : ''}>حادة</option><option value="14px" ${s.radius === '14px' ? 'selected' : ''}>متوسطة</option><option value="22px" ${s.radius === '22px' ? 'selected' : ''}>دائرية</option></select></div>
+    </div></div>
+    <div class="card"><h2>🧩 تفعيل الأقسام</h2>
+    ${mods.map(m => `<div class="switch-row"><span>${m[1]}</span><label class="switch"><input type="checkbox" data-mod="${m[0]}" ${s.modules?.[m[0]] ? 'checked' : ''}><i></i></label></div>`).join('')}</div>
+    <div class="card"><h2>💾 البيانات</h2><div class="frm">
+    <button class="btn ghost" onclick="exportData()">⬇️ تصدير نسخة احتياطية</button>
+    <button class="btn ghost" onclick="document.getElementById('impFile').click()">⬆️ استيراد</button>
+    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(this)">
+    <button class="btn danger" onclick="resetAll()">🗑 مسح كل البيانات</button></div></div>
+  </div>`;
+}
+
+window.pickColor = (c, el) => { const inp = $('#s_accent'); if (inp) inp.value = c; $$('.sw').forEach(x => x.classList.remove('on')); el.classList.add('on'); document.documentElement.style.setProperty('--accent', c); };
+
+function saveSettings() {
+  if (!DB.settings) return;
+  const s = DB.settings;
+  s.companyName = $('#s_name')?.value?.trim() || 'ERP Pro';
+  s.currency = $('#s_cur')?.value?.trim() || 'ر.س';
+  s.taxRate = +$('#s_tax')?.value || 0;
+  s.accent = $('#s_accent')?.value || '#6c5ce7';
+  s.theme = $('#s_theme')?.checked ? 'light' : 'dark';
+  s.fontSize = ($('#s_fs')?.value || '15') + 'px';
+  s.radius = $('#s_rad')?.value || '14px';
+  $$('[data-mod]').forEach(c => { if (s.modules) s.modules[c.dataset.mod] = c.checked ? 1 : 0; });
+  saveDB(); applyTheme(); render(); toast('تم حفظ الإعدادات ✓');
+  addAudit('تحديث الإعدادات', '');
+}
+
+window.exportData = () => {
+  const b = new Blob([JSON.stringify(DB, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'erp-max-backup-' + today() + '.json'; a.click();
+  toast('تم التصدير ✓');
+};
+
+window.importData = inp => {
+  const f = inp.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d.settings || !Array.isArray(d.users)) throw new Error('ملف غير صالح');
+      DB = d; saveDB(); location.reload();
+    } catch (e) { toast('ملف غير صالح أو تالف', 'err'); }
+  };
+  r.readAsText(f);
+};
+
+window.resetAll = () => { if (!confirm('⚠️ مسح كل البيانات نهائياً؟ لا يمكن التراجع!')) return; localStorage.removeItem(LS_KEY); location.reload(); };
+
+// ===== المخططات البيانية =====
+function chartBase(id) {
+  const cv = document.getElementById(id); if (!cv) return null;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = cv.getBoundingClientRect();
+  const w = rect.width, h = rect.height || 260;
+  cv.width = w * dpr; cv.height = h * dpr;
+  cv.style.width = w + 'px'; cv.style.height = h + 'px';
+  const x = cv.getContext('2d'); x.scale(dpr, dpr); x.clearRect(0, 0, w, h);
+  return { x, w, h };
+}
+
+function barChart(id, labels, series) {
+  const c = chartBase(id); if (!c) return;
+  const { x, w, h } = c;
+  const pad = 34, bw = w - pad * 2, bh = h - pad * 1.6;
+  const allVals = series.flatMap(s => s.data);
+  const max = Math.max(...allVals, 1) * 1.15;
+  const muted = getComputedStyle(document.body).getPropertyValue('--muted').trim();
+  const border = getComputedStyle(document.body).getPropertyValue('--border').trim();
+
+  x.strokeStyle = border; x.fillStyle = muted; x.font = '11px Cairo'; x.textAlign = 'center';
+  for (let i = 0; i <= 4; i++) {
+    const y = pad * .6 + bh - (bh / 4) * i;
+    x.beginPath(); x.moveTo(pad, y); x.lineTo(w - pad / 2, y);
+    x.globalAlpha = .4; x.stroke(); x.globalAlpha = 1;
+    x.textAlign = 'right'; x.fillText(fmt(max / 4 * i), pad - 6, y + 4);
+  }
+
+  const n = labels.length, gw = bw / n, bwPer = gw * .7 / series.length;
+  labels.forEach((lb, i) => {
+    x.fillStyle = muted; x.textAlign = 'center'; x.fillText(lb, pad + gw * i + gw / 2, h - 6);
+    series.forEach((s, si) => {
+      const v = s.data[i] || 0, vh = v / max * bh;
+      const bx = pad + gw * i + (gw - gw * .7) / 2 + bwPer * si;
+      const g = x.createLinearGradient(0, pad + bh - vh, 0, pad + bh);
+      g.addColorStop(0, s.color); g.addColorStop(1, s.color + '44');
+      x.fillStyle = g;
+      x.beginPath();
+      if (x.roundRect) { x.roundRect(bx, pad * .6 + bh - vh, Math.max(bwPer - 3, 4), vh, [5, 5, 0, 0]); }
+      else { x.rect(bx, pad * .6 + bh - vh, Math.max(bwPer - 3, 4), vh); }
+      x.fill();
+    });
+  });
+}
+
+const AR_M = ['ينا', 'فبر', 'مار', 'أبر', 'ماي', 'يون', 'يول', 'أغس', 'سبت', 'أكت', 'نوف', 'ديس'];
+function lastMonths(n) {
+  const out = []; const d = new Date(); d.setDate(1);
+  for (let i = n - 1; i >= 0; i--) {
+    const m = new Date(d.getFullYear(), d.getMonth() - i, 1);
+    out.push({ key: m.toISOString().slice(0, 7), label: AR_M[m.getMonth()] });
+  }
+  return out;
+}
+
+function monthlySeries(dbKey) {
+  return lastMonths(6).map(m => (DB[dbKey] || []).filter(r => (r.date || '').startsWith(m.key)).reduce((a, r) => a + r.total, 0));
+}
+
+function afterRender() {
+  const A = DB?.settings?.accent || '#6c5ce7';
+  const labels = lastMonths(6).map(m => m.label);
+  if (PAGE === 'dashboard' || PAGE === 'reports') {
+    barChart('ch1', labels, [{ color: A, data: monthlySeries('sales') }]);
+  }
+  if (PAGE === 'reports') {
+    barChart('ch2', labels, [
+      { color: '#00b894', data: lastMonths(6).map(m => (DB.transactions || []).filter(t => t.type === 'income' && (t.date || '').startsWith(m.key)).reduce((a, t) => a + t.amount, 0)) },
+      { color: '#ff5e6c', data: lastMonths(6).map(m => (DB.transactions || []).filter(t => t.type === 'expense' && (t.date || '').startsWith(m.key)).reduce((a, t) => a + t.amount, 0)) }
+    ]);
+  }
+  if (PAGE === 'pos') renderPOSCart();
+}
+
+let _rt; window.addEventListener('resize', () => { clearTimeout(_rt); _rt = setTimeout(afterRender, 200); });
+
+// ===== خريطة الصفحات =====
+const PAGES = {
+  dashboard: dashPage, pos: posPage,
+  sales: () => invoiceListPage('sale'), purchases: () => invoiceListPage('purchase'),
+  inventory: () => entityPage('products'), customers: () => entityPage('customers'),
+  suppliers: () => entityPage('suppliers'), hr: () => entityPage('employees'),
+  accounting: accountingPage, projects: projectsPage, assets: assetsPage,
+  workflows: workflowsPage, reports: reportsPage, audit: auditPage, settings: settingsPage
+};
+
+// ===== التشغيل =====
+(function initApp() {
+  DB = loadDB();
+  if (!DB) {
+    seedDB();
+  }
+  
+  const requiredArrays = ['users', 'customers', 'suppliers', 'products', 'employees', 
+                          'sales', 'purchases', 'transactions', 'projects', 'assets', 
+                          'workflows', 'notifications', 'audit'];
+  
+  requiredArrays.forEach(key => {
+    if (!Array.isArray(DB[key])) {
+      DB[key] = [];
+    }
+  });
+  
+  if (!DB.settings) {
+    DB.settings = {
+      companyName: 'ERP Pro MAX',
+      currency: 'ر.س',
+      taxRate: 15,
+      accent: '#6c5ce7',
+      theme: 'dark',
+      radius: '14px',
+      fontSize: '15px',
+      modules: {}
+    };
+  }
+  
+  saveDB();
+  applyTheme();
+  renderLoginScreen();
+})();
+</script>
+</body>
+</html>
