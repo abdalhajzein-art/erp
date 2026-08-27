@@ -3696,6 +3696,195 @@
         // Filters
         window.filterTable = filterTable;
         window.filterCards = filterCards;
+        // =============================================
+// 🚀 إصلاح سريع للمشاكل
+// =============================================
+
+// 1. إصلاح دوال showRegister و showLogin
+window.showRegister = function() {
+    console.log('📝 showRegister called');
+    const loginCard = document.getElementById('loginCard');
+    const registerCard = document.getElementById('registerCard');
+    if (loginCard) loginCard.style.display = 'none';
+    if (registerCard) registerCard.style.display = 'block';
+    const msg = document.getElementById('message');
+    if (msg) msg.className = 'message';
+};
+
+window.showLogin = function() {
+    console.log('🔐 showLogin called');
+    const loginCard = document.getElementById('loginCard');
+    const registerCard = document.getElementById('registerCard');
+    if (registerCard) registerCard.style.display = 'none';
+    if (loginCard) loginCard.style.display = 'block';
+    const msg = document.getElementById('message');
+    if (msg) msg.className = 'message';
+};
+
+// 2. إصلاح دالة doRegister
+window.doRegister = async function() {
+    console.log('📝 doRegister called');
+    
+    const name = document.getElementById('regName')?.value?.trim() || '';
+    const email = document.getElementById('regEmail')?.value?.trim() || '';
+    const password = document.getElementById('regPassword')?.value || '';
+    const company = document.getElementById('regCompany')?.value?.trim() || '';
+
+    if (!name || !email || !password) {
+        toast('⚠️ يرجى ملء جميع الحقول المطلوبة', 'warning');
+        return;
+    }
+    if (password.length < 6) {
+        toast('⚠️ كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'warning');
+        return;
+    }
+
+    // ✅ استخدام localStorage مباشرة (بدون Supabase)
+    try {
+        const users = JSON.parse(localStorage.getItem('erp_users') || '[]');
+        
+        if (users.find(u => u.email === email)) {
+            toast('❌ هذا البريد مسجل بالفعل', 'error');
+            return;
+        }
+
+        users.push({
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            name: name,
+            email: email,
+            password: password,
+            role: 'admin',
+            company: company || 'شركتي',
+            createdAt: new Date().toISOString()
+        });
+
+        localStorage.setItem('erp_users', JSON.stringify(users));
+        
+        // حفظ الجلسة
+        localStorage.setItem('erp_session', JSON.stringify({ 
+            email: email,
+            name: name,
+            role: 'admin'
+        }));
+
+        toast('✅ تم إنشاء الحساب بنجاح! مرحباً ' + name, 'success');
+        console.log('✅ User registered:', email);
+        
+        // العودة لتسجيل الدخول
+        setTimeout(() => {
+            window.showLogin();
+            const loginEmail = document.getElementById('loginEmail');
+            const loginPassword = document.getElementById('loginPassword');
+            if (loginEmail) loginEmail.value = email;
+            if (loginPassword) loginPassword.value = password;
+            toast('🎉 يمكنك تسجيل الدخول الآن', 'success');
+        }, 1500);
+
+    } catch (e) {
+        console.error('❌ Register error:', e);
+        toast('❌ خطأ: ' + e.message, 'error');
+    }
+};
+
+// 3. إصلاح دالة doLogin
+window.doLogin = async function() {
+    console.log('🔐 doLogin called');
+    
+    const email = document.getElementById('loginEmail')?.value?.trim() || '';
+    const password = document.getElementById('loginPassword')?.value || '';
+
+    if (!email || !password) {
+        toast('⚠️ يرجى إدخال البريد الإلكتروني وكلمة المرور', 'warning');
+        return;
+    }
+
+    try {
+        const users = JSON.parse(localStorage.getItem('erp_users') || '[]');
+        const user = users.find(u => u.email === email && u.password === password);
+
+        if (!user) {
+            toast('❌ البريد أو كلمة المرور غير صحيحة', 'error');
+            return;
+        }
+
+        localStorage.setItem('erp_session', JSON.stringify({ 
+            email: user.email,
+            name: user.name,
+            role: user.role || 'user'
+        }));
+
+        currentUser = { 
+            email: user.email,
+            user_metadata: { 
+                full_name: user.name,
+                role: user.role || 'user',
+                company: user.company || 'شركتي'
+            }
+        };
+
+        toast('✅ مرحباً ' + user.name + '! تم تسجيل الدخول', 'success');
+        console.log('✅ Login success:', email);
+        
+        // عرض لوحة التحكم بعد تسجيل الدخول
+        showApp();
+
+    } catch (e) {
+        console.error('❌ Login error:', e);
+        toast('❌ خطأ: ' + e.message, 'error');
+    }
+};
+
+// 4. إصلاح دالة doLogout
+window.doLogout = function() {
+    if (!confirm('هل تريد تسجيل الخروج؟')) return;
+    
+    localStorage.removeItem('erp_session');
+    currentUser = null;
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('appContainer').style.display = 'none';
+    toast('👋 تم تسجيل الخروج', 'info');
+};
+
+// 5. إصلاح toast (إذا لم توجد)
+if (typeof toast === 'undefined') {
+    window.toast = function(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        if (!container) {
+            alert(message);
+            return;
+        }
+        const colors = {
+            success: 'toast-success',
+            error: 'toast-error',
+            warning: 'toast-warning',
+            info: 'toast-info'
+        };
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+        const el = document.createElement('div');
+        el.className = `toast ${colors[type] || 'toast-info'}`;
+        el.innerHTML = `${icons[type] || 'ℹ️'} ${message}`;
+        container.appendChild(el);
+        setTimeout(() => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateX(-50px)';
+            setTimeout(() => el.remove(), 400);
+        }, 4000);
+    };
+}
+
+// 6. إصلاح مشكلة supabase المكرر
+// تأكد أن supabase معرف مرة واحدة فقط
+if (typeof supabase === 'undefined') {
+    var supabase = null;
+}
+
+console.log('✅ تم تطبيق الإصلاحات!');
+console.log('💡 جرب إنشاء حساب جديد الآن');
     </script>
 </body>
 </html>
