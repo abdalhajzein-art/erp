@@ -3780,61 +3780,7 @@
             toast('🗑️ تم مسح السجل', 'info');
         }
 
-        // =============================================
-        // 29. SETTINGS (مع كل الإعدادات الديناميكية)
-        // =============================================
-        function renderSettings() {
-            const settings = getSettings();
 
-            let html = `
-                <div class="tab-container" id="settingsTabs">
-                    <button class="tab-btn active" data-tab="settings-company">🏢 الشركة</button>
-                    <button class="tab-btn" data-tab="settings-finance">💰 المالية</button>
-                    <button class="tab-btn" data-tab="settings-inventory">📦 المخزون</button>
-                    <button class="tab-btn" data-tab="settings-assets">🏢 الأصول</button>
-                    <button class="tab-btn" data-tab="settings-hr">👔 الموارد البشرية</button>
-                    <button class="tab-btn" data-tab="settings-accounting">📒 المحاسبة</button>
-                    <button class="tab-btn" data-tab="settings-workflows">⚙️ سير العمل</button>
-                    <button class="tab-btn" data-tab="settings-notifications">🔔 الإشعارات</button>
-                </div>
-                <div id="settings-company" class="tab-content active">
-                    ${renderCompanySettings(settings)}
-                </div>
-                <div id="settings-finance" class="tab-content">
-                    ${renderFinanceSettings(settings)}
-                </div>
-                <div id="settings-inventory" class="tab-content">
-                    ${renderInventorySettings(settings)}
-                </div>
-                <div id="settings-assets" class="tab-content">
-                    ${renderAssetsSettings(settings)}
-                </div>
-                <div id="settings-hr" class="tab-content">
-                    ${renderHRSettings(settings)}
-                </div>
-                <div id="settings-accounting" class="tab-content">
-                    ${renderAccountingSettings(settings)}
-                </div>
-                <div id="settings-workflows" class="tab-content">
-                    ${renderWorkflowSettings(settings)}
-                </div>
-                <div id="settings-notifications" class="tab-content">
-                    ${renderNotificationSettings(settings)}
-                </div>
-            `;
-
-            $('pageContent').innerHTML = html;
-
-            document.querySelectorAll('#settingsTabs .tab-btn').forEach(btn => {
-                btn.onclick = function() {
-                    document.querySelectorAll('#settingsTabs .tab-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    document.querySelectorAll('#settingsTabs .tab-content').forEach(t => t.classList.remove(
-                        'active'));
-                    document.getElementById(this.dataset.tab).classList.add('active');
-                };
-            });
-        }
 
         function renderCompanySettings(s) {
             const c = s.company;
@@ -3993,6 +3939,98 @@
                 </div></div>
             `;
         }
+
+        // =============================================
+// 29. SETTINGS (الإصدار النهائي المُصحح)
+// =============================================
+function renderSettings() {
+    const settings = getSettings();
+
+    let html = `
+        <div class="tab-container" id="settingsTabs">
+            <button class="tab-btn active" data-tab="settings-company">🏢 الشركة</button>
+            <button class="tab-btn" data-tab="settings-finance">💰 المالية</button>
+            <button class="tab-btn" data-tab="settings-inventory">📦 المخزون</button>
+            <button class="tab-btn" data-tab="settings-assets">🏢 الأصول</button>
+            <button class="tab-btn" data-tab="settings-hr">👔 الموارد البشرية</button>
+            <button class="tab-btn" data-tab="settings-accounting">📒 المحاسبة</button>
+            <button class="tab-btn" data-tab="settings-workflows">⚙️ سير العمل</button>
+            <button class="tab-btn" data-tab="settings-notifications">🔔 الإشعارات</button>
+        </div>
+        <div id="settingsContent">
+            <div id="settings-company" class="tab-content active">
+                ${renderCompanySettings(settings)}
+            </div>
+            <div id="settings-finance" class="tab-content">
+                ${renderFinanceSettings(settings)}
+            </div>
+            <div id="settings-inventory" class="tab-content">
+                ${renderInventorySettings(settings)}
+            </div>
+            <div id="settings-assets" class="tab-content">
+                ${renderAssetsSettings(settings)}
+            </div>
+            <div id="settings-hr" class="tab-content">
+                ${renderHRSettings(settings)}
+            </div>
+            <div id="settings-accounting" class="tab-content">
+                ${renderAccountingSettings(settings)}
+            </div>
+            <div id="settings-workflows" class="tab-content">
+                ${renderWorkflowSettings(settings)}
+            </div>
+            <div id="settings-notifications" class="tab-content">
+                ${renderNotificationSettings(settings)}
+            </div>
+        </div>
+        <div style="margin-top:20px;">
+            <button class="btn btn-primary btn-lg btn-block" onclick="saveAllSettings()">💾 حفظ جميع الإعدادات</button>
+        </div>
+    `;
+
+    $('pageContent').innerHTML = html;
+
+    // ===== تشغيل التبويبات بشكل صحيح =====
+    const tabs = document.querySelectorAll('#settingsTabs .tab-btn');
+    const contents = document.querySelectorAll('#settingsContent .tab-content');
+
+    // إخفاء جميع المحتويات وإزالة active من التبويبات
+    tabs.forEach(t => t.classList.remove('active'));
+    contents.forEach(c => c.classList.remove('active'));
+
+    // تفعيل التبويب الأول والمحتوى الأول
+    if (tabs.length > 0) {
+        tabs[0].classList.add('active');
+        const firstContent = document.getElementById('settings-company');
+        if (firstContent) firstContent.classList.add('active');
+    }
+
+    // إضافة حدث النقر لكل تبويب
+    tabs.forEach(btn => {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            
+            // 1. إزالة active من جميع التبويبات
+            tabs.forEach(b => b.classList.remove('active'));
+            
+            // 2. إزالة active من جميع المحتويات
+            contents.forEach(c => c.classList.remove('active'));
+            
+            // 3. تفعيل التبويب الحالي
+            this.classList.add('active');
+            
+            // 4. تفعيل المحتوى المرتبط
+            const tabId = this.dataset.tab;
+            const content = document.getElementById(tabId);
+            if (content) {
+                content.classList.add('active');
+                console.log('📑 تم فتح التبويب:', tabId);
+            } else {
+                console.warn('⚠️ المحتوى غير موجود:', tabId);
+            }
+        };
+    });
+                    }
 
         function renderNotificationSettings(s) {
             const n = s.notifications;
